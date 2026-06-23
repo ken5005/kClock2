@@ -11,7 +11,11 @@ import java.util.Locale;
 
 public class Main {
 
-    private static final int FONT_SIZE = 32;
+    private static final int    WINDOW_WIDTH  = 290;
+    private static final int    WINDOW_HEIGHT = 45;
+    private static final int    FONT_SIZE     = 27;
+    private static final Color  TEXT_COLOR    = Color.WHITE;
+    private static final Color  BG_COLOR      = Color.BLACK;
 
     private static final DateTimeFormatter FMT =
             DateTimeFormatter.ofPattern("HH:mm:ss M/d(E)", Locale.JAPANESE);
@@ -25,6 +29,7 @@ public class Main {
 
             JLabel label = new JLabel("", SwingConstants.CENTER);
             label.setFont(new Font(Font.MONOSPACED, Font.PLAIN, FONT_SIZE));
+            label.setForeground(TEXT_COLOR);
 
             label.setText(LocalDateTime.now().format(FMT));
 
@@ -63,10 +68,11 @@ public class Main {
 
             JPanel panel = new JPanel(new BorderLayout());
             panel.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 0));
+            panel.setBackground(BG_COLOR);
             panel.add(label, BorderLayout.CENTER);
 
             frame.setContentPane(panel);
-            frame.pack();
+            frame.setSize(WINDOW_WIDTH, WINDOW_HEIGHT);
             frame.setLocationRelativeTo(null);
             frame.setVisible(true);
         });
