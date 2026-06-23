@@ -1,17 +1,32 @@
 package ken5005.kclock;
 
-//TIP To <b>Run</b> code, press <shortcut actionId="Run"/> or
-// click the <icon src="AllIcons.Actions.Execute"/> icon in the gutter.
-public class Main {
-	public static void main(String[] args) {
-		//TIP Press <shortcut actionId="ShowIntentionActions"/> with your caret at the highlighted text
-		// to see how IntelliJ IDEA suggests fixing it.
-		System.out.printf("Hello and welcome!");
+import javax.swing.*;
+import java.awt.*;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 
-		for (int i = 1; i <= 5; i++) {
-			//TIP Press <shortcut actionId="Debug"/> to start debugging your code. We have set one <icon src="AllIcons.Debugger.Db_set_breakpoint"/> breakpoint
-			// for you, but you can always add more by pressing <shortcut actionId="ToggleLineBreakpoint"/>.
-			System.out.println("i = " + i);
-		}
-	}
+public class Main {
+
+    private static final DateTimeFormatter FMT = DateTimeFormatter.ofPattern("HH:mm:ss");
+
+    public static void main(String[] args) {
+        SwingUtilities.invokeLater(() -> {
+            JFrame frame = new JFrame("kClock");
+            frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+
+            JLabel label = new JLabel("", SwingConstants.CENTER);
+            label.setFont(new Font(Font.MONOSPACED, Font.PLAIN, 48));
+
+            // 初回表示
+            label.setText(LocalTime.now().format(FMT));
+
+            // 1 秒ごとに EDT 上で時刻を更新
+            new Timer(1000, e -> label.setText(LocalTime.now().format(FMT))).start();
+
+            frame.add(label, BorderLayout.CENTER);
+            frame.pack();
+            frame.setLocationRelativeTo(null); // 画面中央に配置
+            frame.setVisible(true);
+        });
+    }
 }
