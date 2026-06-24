@@ -1,0 +1,10 @@
+#kClock configuration
+#Wed Jun 24 16:42:45 JST 2026
+bg.color=\#C6C6C6
+font.family=MS UI Gothic
+font.size=31
+text.color=\#000000
+window.height=48
+window.width=300
+window.x=53
+window.y=1392

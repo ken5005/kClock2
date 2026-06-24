@@ -20,17 +20,27 @@ public class Main {
         Runtime.getRuntime().addShutdownHook(new Thread(config::save));
 
         SwingUtilities.invokeLater(() -> {
+            UIManager.put("ToolTip.font", new Font("Monospaced", Font.PLAIN, 18));
+
             JFrame frame = new JFrame("kClock");
             frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
             frame.setUndecorated(true);
             frame.setAlwaysOnTop(true);
+            frame.setFocusableWindowState(false);
+            frame.setAutoRequestFocus(false);
 
             JLabel label = new JLabel("", SwingConstants.CENTER);
             label.setFont(new Font(config.getFontFamily(), Font.PLAIN, config.getFontSize()));
             label.setForeground(config.getTextColor());
 
             label.setText(LocalDateTime.now().format(FMT));
-            new Timer(1000, e -> label.setText(LocalDateTime.now().format(FMT))).start();
+            DateTimeFormatter FULL =
+                    DateTimeFormatter.ofPattern("yyyy年M月d日(E) HH:mm:ss", Locale.JAPANESE);
+            new Timer(1000, e ->{
+                label.setText(LocalDateTime.now().format(FMT));
+                label.setToolTipText(LocalDateTime.now().format(FULL));
+            }).start();
+            new Timer(2000, e -> frame.toFront()).start();
 
             JPanel panel = new JPanel(new BorderLayout());
             panel.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 0));
@@ -115,9 +125,9 @@ public class Main {
         });
 
         JSpinner widthSpinner  = new JSpinner(
-                new SpinnerNumberModel(config.getWindowWidth(),  10, 2000, 1));
+                new SpinnerNumberModel(clamp(config.getWindowWidth(), 10, 2000), 10, 2000, 1));
         JSpinner heightSpinner = new JSpinner(
-                new SpinnerNumberModel(config.getWindowHeight(), 10, 2000, 1));
+                new SpinnerNumberModel(clamp(config.getWindowHeight(), 10, 2000), 10, 2000, 1));
 
         JPanel form = new JPanel(new GridBagLayout());
         form.setBorder(BorderFactory.createEmptyBorder(8, 8, 4, 8));
@@ -164,7 +174,9 @@ public class Main {
         dialog.setLocationRelativeTo(frame);
         dialog.setVisible(true);
     }
-
+    private static int clamp(int v, int min, int max) {
+        return Math.max(min, Math.min(max, v));
+    }
     // カラースウォッチボタン：paintComponent をオーバーライドして L&F に依存せず色を表示
     private static JButton makeColorButton(Color color) {
         JButton btn = new JButton() {
