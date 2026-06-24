@@ -25,6 +25,11 @@
 - **v0.2以降はブランチ→PR練習**: `git switch -c feature/xxx` → 実装 → commit → `git push -u origin feature/xxx` → PR作成 → 自分でレビュー → mainマージ → `git switch main && git pull`。
 - Swing更新は EDT 安全に: `javax.swing.Timer` + `SwingUtilities.invokeLater`。別スレッド＋sleepでUI直叩きはしない。
 
+## IntelliJ お作法
+- **初回の実行は必ず main メソッド横の gutter緑▶ →「Run 'クラス名.main()'」から**。これで名前付きRun構成が自動生成され、設定（multiple instances 等）が効く。
+- ドロップダウンが **`Current File`** のままRunしないこと。Current Fileは一時実行モードで、構成が保存されず設定も持てない（→ Run連打で旧プロセスが閉じない等の謎挙動の元）。名前（`Main` 等）が出てる構成でRunするのが正。
+- 「Run押したら前のプロセスを止めて再起動」は名前付き構成の **「Allow multiple instances」OFF**（デフォルトOFF）で効く。Current Fileだと効かない。
+
 ## 環境のハマりどころ（触ると死ぬ系）
 - **HOME = `C:\tools2\etc\home`**（大昔のEmacs/Mule用設定。`.emacs.d` 等が現役）。**絶対に触らない**。
 - インストーラ系は Unix流に `$HOME\.local\bin`（= `C:\tools2\etc\home\.local\bin`）に入れに行く。Claude Code本体もここ（現 2.1.186）。
