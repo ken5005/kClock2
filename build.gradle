@@ -15,6 +15,12 @@ dependencies {
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 }
 
+jar {
+    manifest {
+        attributes 'Main-Class': 'ken5005.kclock.Main'
+    }
+}
+
 test {
     useJUnitPlatform()
 }
