@@ -19,14 +19,26 @@
 - [x] v0.3: 日付＋曜日＋秒つき時刻を横一列（`HH:mm:ss M/d(E)` 日本語曜日）
 - [x] v0.4: 窓サイズ固定＋定数化（サイズ/フォント/色）
 - [x] v0.5: 設定の永続化＋設定ダイアログ（`%APPDATA%\kClock\config.properties`、Config集約、右クリックSettings…、窓位置記憶）
-- [ ] 次フェーズ: README / ホバーで年など詳細表示 / 配色・サイズの最終微調整  ← 今ここ
+- [x] v0.6: clamp化／ホバーで年込みフル表示(tooltip)／実行可能jar化＋javaw起動／最前面強化B案
+- [ ] 次フェーズ: README作成 / 配色・サイズの最終微調整  ← 今ここ
 
 ## 設定ファイル（v0.5〜）
 - 保存先 **`%APPDATA%\kClock\config.properties`**（`.properties`形式）。**`Config` クラスが load/save/デフォルトを集約**。旧 static final 定数は「デフォルト値」扱いに格下げ。
 - 項目: `window.width/height/x/y` `font.size` `font.family` `text.color(#RRGGBB)` `bg.color`。各値は欠損/不正ならデフォルトにフォールバック（1個壊れても落とさない）。
 - 保存タイミング: 終了時 `addShutdownHook`（System.exit経由でも走る・I/Oのみ＝EDT非依存）＋ 設定ダイアログの OK/Apply。窓位置はドラッグ完了(mouseReleased)で記録。
 - メモ: `#` は `.properties` 上で `\#` にエスケープ保存される＝**正常**（store↔load対称）。Settingsのフォント一覧は OS の"全ユーザー登録"フォントのみ（ユーザー単位インストールは出ないことがある＝「すべてのユーザーにインストール」で出る）。
-- 罠: `SpinnerNumberModel` は `min<=value<=max` を外れると即例外。config.properties に範囲外を手書きすると Settings で落ちうる（将来 clamp で保険可）。リポジトリ圏外なのでコミットされない。
+- 罠: `SpinnerNumberModel` は `min<=value<=max` を外れると即例外。**v0.6 で Spinner 生成時に `clamp(config値,min,max)` を噛ませて保険済み**（範囲外を手書きしても Settings が落ちない）。リポジトリ圏外なのでコミットされない。
+
+## 表示まわり（v0.6で追加）
+- **clamp**: `clamp(int v,int min,int max)` ヘルパ。fontSize/width/height の各 Spinner 生成で噛ませ、手書きconfigが範囲外でもダイアログが落ちない保険。
+- **tooltip**: ラベルにホバーで `yyyy年M月d日(E) HH:mm:ss`（年込みフル）を表示。毎秒Timerで `setToolTipText`。ToolTipフォントは UI構築前に `UIManager.put("ToolTip.font", new Font("Monospaced",PLAIN,18))` を1回。
+- **最前面強化B案**: `setFocusableWindowState(false)` ＋ `setAutoRequestFocus(false)` ＋ 別 `new Timer(2000, e->frame.toFront())`。**※非フォーカス化が必須**——入れないと2秒ごとに他アプリのフォーカスを奪う。Windowsのtopmost再ソートは完全制御不可なのでTimerは保険。
+
+## ビルド・起動（v0.6〜）
+- kClockは**外部依存ゼロ＝素のjarでOK**（shadowJar不要）。`build.gradle` に `jar { manifest { attributes 'Main-Class': 'ken5005.kclock.Main' } }`。
+- `gradlew jar` → `build/libs/kClock2-1.0-SNAPSHOT.jar`。
+- GUI起動は **`javaw`**（黒窓なし）。**javaw.exe への .lnk ショートカット**が定番（`.vbs`は非推奨）。
+- ログオン自動起動: `.lnk` を `shell:startup`（`%APPDATA%\Microsoft\Windows\Start Menu\Programs\Startup`）に置く。
 
 ## 作業ルール（重要）
 - **分業**: 考える作業（コード生成・調査）＝Claude、単純な手作業（git/cd/copy）＝自分が外側PowerShellで手打ち。
@@ -34,6 +46,7 @@
 - **Claude Code のモデルは `/model sonnet`**（設計はチャット側Opusで詰め、実装はClaude Code Sonnet。auto-accept OFF＋diffレビューで品質担保）。opusplanは「Claude Code内でPlan modeを使う人」向けで本構成では出番薄い。
 - **v0.2以降はブランチ→PR練習**: `git switch -c feature/xxx` → 実装 → commit → `git push -u origin feature/xxx` → PR作成 → 自分でレビュー → mainマージ → `git switch main && git pull` → `git branch -d feature/xxx`。
 - Swing更新は EDT 安全に: `javax.swing.Timer` + `SwingUtilities.invokeLater`。別スレッド＋sleepでUI直叩きはしない。
+- **git alias（全マシン導入済み）**: `st`=status -sb / `sw`=switch / `aa`=add -A / `cm`=commit -m / `br`=branch / `lg`=log --oneline --graph --decorate -20。軽微変更（CLAUDE.md更新等）は main 直 push でOK。
 
 ## IntelliJ お作法
 - **初回の実行は必ず main メソッド横の gutter緑▶ →「Run 'クラス名.main()'」から**。これで名前付きRun構成が自動生成され、設定（multiple instances 等）が効く。
