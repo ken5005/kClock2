@@ -5,6 +5,10 @@ build/
 !**/src/test/**/build/
 .kotlin
 
+### ken
+privateFiles/
+docs/**/*.html
+
 ### IntelliJ IDEA ###
 .idea/
 *.iws
